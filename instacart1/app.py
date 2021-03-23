@@ -37,9 +37,18 @@ def index():
                     cur = db.cursor()
                     tic = time()
                     r = cur.execute(query_con)
-                    if cur.description==() and r==0:
-                        html_out='<h3 style="color:white">Query Executed</h3>'
-                    else:
+                    if cur.description is not None and r==0:
+                        columns = cur.description
+                        key_list = []
+                        for i in range(len(columns)):
+                            key_list.append(columns[i][0])
+                        df=DataFrame(columns=key_list)
+                        c=1
+                    elif cur.description is None and r==0:
+                        c=2
+                    elif cur.description is None and r!=0:
+                        c=3
+                    elif cur.description is not None and r!=0:
                         columns = cur.description
                         key_list = []
                         data_row = cur.fetchall()
@@ -51,45 +60,63 @@ def index():
                         else:
                             df.index = np.arange(1, len(df)+1)
                             df.columns=(key_list)
-                        html_out = '<div style="background-color:white;display:inline-block;margin-left: auto;margin-right: auto;">'+df.to_html(classes='table table-striped table-hover')+'</div>'
+                        c=0
+                            
+                    
+                    db.commit()
                     cur.close()
                     db.close()
                     toc = time()
-                    result = '<h3 style="color:white;">'+"Time elapsed(in seconds):"+str(round((toc-tic),4))+'</h3>'+'<br>'+html_out
+                    if c==1:
+                        return render_template('index.html',column_names=df.columns.values,row_data=[],exec_time = ("Time Elapsed(in sec): "+str(round(toc-tic,7))),zip=zip)
+                    if c==3:
+                        return render_template('index.html',column_names=[],row_data=[],exec_time = ("Time Elapsed(in sec): "+str(round(toc-tic,7))),zip=zip)+"Query Executed: "+str(r)+" rows affected"
+                    if c==2:
+                        return render_template('index.html',column_names=[],row_data=[],exec_time = ("Time Elapsed(in sec): "+str(round(toc-tic,7))),zip=zip)+"Query Executed: "    
+                    if c==0:
+                        return render_template('index.html',column_names=df.columns.values,row_data=list(df.values.tolist()),exec_time = ("Time Elapsed(in sec): "+str(round(toc-tic,7))),zip=zip)
 
                 elif option=="redshift":
-                    rsdb = psycopg2.connect(dbname= 'instacartredshift',
+                    db = psycopg2.connect(dbname= 'instacartredshift',
                                             host='redshift-cluster-1.cfxnwqcezz7k.us-east-1.redshift.amazonaws.com',
                                             port= '5439',
                                             user= 'root',
                                             password= 'Abcd1234')
-                    currs = rsdb.cursor()
-                    print(option)
+                    cur = db.cursor()
                     tic = time()
-                    currs.execute(query_con)
-                    if "select" not in query_con and "show" not in query_con and "describe" not in query_con:
-                        rsdb.commit()
-                        html_out='<h3 style="color:white">Query Executed</h3>'
-                    else:
-                        columns = currs.description
+                    r = cur.execute(query_con)
+                    if cur.description is None:
+                        c=2
+                    elif cur.description is not None and r!=0:
+                        print("chelho")
+                        columns = cur.description
+                        data_row = cur.fetchall()
                         key_list = []
-                        data_row = currs.fetchall()
                         for i in range(len(columns)):
                             key_list.append(columns[i][0])
                         df=DataFrame(data_row)
-                        df.index = np.arange(1, len(df)+1)
-                        df.columns=(key_list)
-                        html_out = '<div style="background-color:white;display:inline-block;margin-left: auto;margin-right: auto;">'+df.to_html(classes='table table-striped table-hover')+'</div>'
-                    currs.close()
-                    rsdb.close()
+                        if data_row==[]:
+                            df=DataFrame(columns=key_list)
+                        else:
+                            df.index = np.arange(1, len(df)+1)
+                            df.columns=(key_list)
+                        c=0        
+                    
+                    db.commit()
+                    cur.close()
+                    db.close()
                     toc = time()
-                    result = '<h3 style="color:white;">'+"Time elapsed(in seconds):"+str(round((toc-tic),4))+'</h3>'+'<br>'+html_out
+        
+                    if c==2:
+                        return render_template('index.html',column_names=[],row_data=[],exec_time = ("Time Elapsed(in sec): "+str(round(toc-tic,7))),zip=zip)+"Query Executed: "    
+                    if c==0:
+                        return render_template('index.html',column_names=df.columns.values,row_data=list(df.values.tolist()),exec_time = ("Time Elapsed(in sec): "+str(round(toc-tic,7))),zip=zip)
+
             except Exception as e:
-                result = '<h3 style="color:white;">'+str(e)+'</h3>'
-
-
-
-    return render_template('index.html')+result
+                result = '<h3>'+str(e)+'</h3>'
+                return render_template('index.html',column_names=[],row_Data=list(),exec_time="")+result
+    else:
+        return render_template('index.html',column_names=[],row_data=list(),exec_time="")
 
 if __name__ == '__main__':
-    app.run(host="0.0.0.0",port=8080)
+    app.run(host="0.0.0.0",port=8080,debug=True)
