@@ -3,29 +3,77 @@
   <head>
     <meta charset="utf-8">
     <title>Instacart</title>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-ho+j7jyWK8fNQe+A12Hb8AhRq26LrZ/JpcUGGOn+Y7RsweNrtN/tE3MoK7ZeZDyx" crossorigin="anonymous"></script>
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.10.24/css/dataTables.bootstrap.min.css">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
     <link rel="preconnect" href="https://fonts.gstatic.com">
     <link href="https://fonts.googleapis.com/css2?family=Grenze:wght@100&family=Ruslan+Display&display=swap" rel="stylesheet">
+    <style>
+      table {
+        counter-reset: rowNumber;
+      }
+
+      table tr:not(:first-child) {
+        counter-increment: rowNumber;
+      }
+
+      table tr td:first-child::before {
+        content: counter(rowNumber);
+        min-width: 1em;
+        margin-right: 0.5em;
+      }
+      #example{
+        width:75%;
+      }
+    </style>
+    <script type="text/javascript">
+      $(document).ready(function() {
+          $('#example').DataTable();
+      });
+    </script>
   </head>
-  <body style="background-image:url(https://image.freepik.com/free-vector/3d-illustration-cloud-server_1302-14965.jpg)" >
+  <body>
 
       {% block body %}
-      <div align = "center" >
-      <h1 style="text-align: center;color:white;font-family: 'Grenze', serif;font-size:60px;">Database: Instacart</h1>
+        <div align = "center" >
+        <h1 style="text-align: center;font-family: 'Grenze', serif;font-size:60px">Database: Instacart</h1>
         <form class="form_class" method="post">
           <div class="database">
-            <input type="radio" id="mysql" style="vertical-align: middle;" name="database" value="mysql">
+            <input type="radio" class="form-check-input" id="mysql" style="vertical-align: middle;" name="database" value="mysql">
             <img src="https://download.logo.wine/logo/MySQL/MySQL-Logo.wine.png" style="vertical-align: middle;" height="110px" width="200px" alt="MySQL">
-            <input type="radio" id="redshift" style="vertical-align: middle;" name="database" value="redshift">
+            <input type="radio" class="form-check-input" id="redshift" style="vertical-align: middle;" name="database" value="redshift">
             <img src="https://blog.kloud.io/hubfs/logo-amazon-redshift-1.png" style="vertical-align: middle;" height="110px" width="200px" alt="Redshift">
           </div>
           <br><br>
-          <label for="query" style="color:white;font-family: 'Grenze', serif;font-size:30px;font-weight: bold;">Write your query below</label>
+          <label for="query" style="font-family: 'Grenze', serif;font-size:30px;font-weight: bold;">Write your query below</label>
           <br>
-          <textarea id="query" name="query" rows="7" cols="100" style="color:white;font-size:14px;background-color:black"> </textarea>
+          <textarea id="query" name="query" rows="7" cols="100" style="color:black;font-size:14px;background-color:white"> </textarea>
           <br>
           <input type="submit"  value="Execute query">
           <br>
         </form>
+        <h4>{{exec_time}}</h4>
+        <br>
+	      {% for col in column_names[:1] %}
+          <table id="example" class="table table-striped table-hover table-bordered">
+            <tr>
+              <th>#</th>
+                {% for col in column_names %}
+                <th scope="col">{{col}}</th>
+                {% endfor %}
+            </tr>
+            {% for row in row_data %}
+            <tr id="row">
+                <td></td>
+                {% for col, row_ in zip(column_names, row) %}
+                  <td>{{row_}}</td>
+                {% endfor %}
+            </tr>
+            {% endfor %}
+          </table>
+        {% else %}
+          <p></p>
+        {% endfor %}
       {% endblock %}
   </body>
 </html>
