@@ -8,7 +8,12 @@
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
     <link rel="preconnect" href="https://fonts.gstatic.com">
     <link href="https://fonts.googleapis.com/css2?family=Grenze:wght@100&family=Ruslan+Display&display=swap" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.gstatic.com">
+    <link href="https://fonts.googleapis.com/css2?family=Merriweather&display=swap" rel="stylesheet">
     <style>
+      body{
+        background-color: #f5fcf9;
+      }
       table {
         counter-reset: rowNumber;
       }
@@ -36,25 +41,34 @@
 
       {% block body %}
         <div align = "center" >
-        <h1 style="text-align: center;font-family: 'Grenze', serif;font-size:60px">Database: Instacart</h1>
+        <h1 style="text-align: center;font-family: 'Merriweather', serif;font-size:60px">Instacart</h1>
         <form class="form_class" method="post">
-          <div class="database">
-            <input type="radio" class="form-check-input" id="mysql" style="vertical-align: middle;" name="database" value="mysql">
-            <img src="https://download.logo.wine/logo/MySQL/MySQL-Logo.wine.png" style="vertical-align: middle;" height="110px" width="200px" alt="MySQL">
-            <input type="radio" class="form-check-input" id="redshift" style="vertical-align: middle;" name="database" value="redshift">
-            <img src="https://blog.kloud.io/hubfs/logo-amazon-redshift-1.png" style="vertical-align: middle;" height="110px" width="200px" alt="Redshift">
+          <div class="btn-group database" role="group" aria-label="Basic example">
+            <!--<input type="radio" class="form-check-input" id="mysql" style="vertical-align: middle;" name="database" value="mysql">-->
+            <label class="btn btn-secondary">
+            <input type="radio"  class="form-check-input" id="mysql" name="database" value="mysql" autocomplete="off" checked> <img src="https://download.logo.wine/logo/MySQL/MySQL-Logo.wine.png" style="vertical-align: middle;" height="110px" width="200px" alt="MySQL">
+            </label>
+            <!-- <img src="https://download.logo.wine/logo/MySQL/MySQL-Logo.wine.png" style="vertical-align: middle;" height="110px" width="200px" alt="MySQL"> -->
+            <label class="btn btn-secondary">
+            <input type="radio"  class="form-check-input" id="redshift" name="database" value="redshift" autocomplete="off"> <img src="https://blog.kloud.io/hubfs/logo-amazon-redshift-1.png" style="vertical-align: middle;" height="110px" width="200px" alt="Redshift">
+            </label>
+            <!-- <input type="radio" class="form-check-input" id="redshift" style="vertical-align: middle;" name="database" value="redshift">
+             <img src="https://blog.kloud.io/hubfs/logo-amazon-redshift-1.png" style="vertical-align: middle;" height="110px" width="200px" alt="Redshift">
+           -->
           </div>
           <br><br>
           <label for="query" style="font-family: 'Grenze', serif;font-size:30px;font-weight: bold;">Write your query below</label>
           <br>
-          <textarea id="query" name="query" rows="7" cols="100" style="color:black;font-size:14px;background-color:white"> </textarea>
+          <textarea id="query" name="query" rows="7" cols="100" style="color:black;font-size:14px;background-color:#f5fcf9"> </textarea>
           <br>
-          <input type="submit"  value="Execute query">
+          <input type="submit" class="btn btn-outline-dark" value="Execute query">
           <br>
         </form>
         <h4>{{exec_time}}</h4>
         <br>
 	      {% for col in column_names[:1] %}
+          <a class="btn btn-primary" role="button"href="http://ec2-18-232-130-25.compute-1.amazonaws.com:8080/getPlotCSV">Click here to download CSV File</a>
+          <br><br><br>
           <table id="example" class="table table-striped table-hover table-bordered">
             <tr>
               <th>#</th>
