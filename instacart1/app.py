@@ -16,6 +16,7 @@ result = ""
 csv_file = None
 pdf_file = None
 html_out = ""
+last_query = ""
 
 @app.route("/getPlotCSV")
 def getPlotCSV():
@@ -40,13 +41,14 @@ def getPdf():
 @app.route('/',methods=['GET','POST'])
 def index():
 
-    global result,csv_file,html_out
+    global result,csv_file,html_out,last_query
     csv_file = None
     html_out = ""
     result=""
     if request.method == 'POST':
             try:
                 query_con = request.form['query']
+                last_query = query_con
                 option = request.form['database']
                 if option=="mysql":
                     db = pymysql.connect(host="database-2.cuxnpjy7qt1g.us-east-1.rds.amazonaws.com",
@@ -90,13 +92,13 @@ def index():
                     db.close()
                     toc = time()
                     if c==1:
-                        return render_template('index.html',column_names=df.columns.values,row_data=[],exec_time = ("Time Elapsed(in sec): "+str(round(toc-tic,7))),zip=zip)
+                        return render_template('index.html',column_names=df.columns.values,row_data=[],exec_time =str(round(toc-tic,7)),zip=zip,last_q = last_query)
                     if c==3:
-                        return render_template('index.html',column_names=[],row_data=[],exec_time = ("Time Elapsed(in sec): "+str(round(toc-tic,7))),zip=zip)+"Query Executed: "+str(r)+" rows affected"
+                        return render_template('index.html',column_names=[],row_data=[],exec_time =str(round(toc-tic,7)),zip=zip,last_q = last_query)+"Query Executed: "+str(r)+" rows affected"
                     if c==2:
-                        return render_template('index.html',column_names=[],row_data=[],exec_time = ("Time Elapsed(in sec): "+str(round(toc-tic,7))),zip=zip)+"Query Executed: "
+                        return render_template('index.html',column_names=[],row_data=[],exec_time = str(round(toc-tic,7)),zip=zip,last_q = last_query)+"Query Executed: "
                     if c==0:
-                        return render_template('index.html',column_names=df.columns.values,row_data=list(df.values.tolist()),exec_time = ("Time Elapsed(in sec): "+str(round(toc-tic,7))),zip=zip)
+                        return render_template('index.html',column_names=df.columns.values,row_data=list(df.values.tolist()),exec_time = str(round(toc-tic,7)),zip=zip,last_q = last_query)
 
                 elif option=="redshift":
                     db = psycopg2.connect(dbname= 'instacartredshift',
@@ -131,15 +133,15 @@ def index():
                     toc = time()
 
                     if c==2:
-                        return render_template('index.html',column_names=[],row_data=[],exec_time = ("Time Elapsed(in sec): "+str(round(toc-tic,7))),zip=zip)+"Query Executed: "
+                        return render_template('index.html',column_names=[],row_data=[],exec_time = str(round(toc-tic,7)),zip=zip,last_q = last_query)+"Query Executed: "
                     if c==0:
-                        return render_template('index.html',column_names=df.columns.values,row_data=list(df.values.tolist()),exec_time = ("Time Elapsed(in sec): "+str(round(toc-tic,7))),zip=zip)
+                        return render_template('index.html',column_names=df.columns.values,row_data=list(df.values.tolist()),exec_time = str(round(toc-tic,7)),zip=zip,last_q = last_query)
 
             except Exception as e:
                 result = '<h3>'+str(e)+'</h3>'
-                return render_template('index.html',column_names=[],row_Data=list(),exec_time="")+result
+                return render_template('index.html',column_names=[],row_Data=list(),exec_time="",last_q = last_query)+result
     else:
-        return render_template('index.html',column_names=[],row_data=list(),exec_time="")
+        return render_template('index.html',column_names=[],row_data=list(),exec_time="",last_q="")
 
 
 
