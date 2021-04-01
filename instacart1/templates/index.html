@@ -64,7 +64,12 @@
           <input type="submit" class="btn btn-outline-dark" value="Execute query">
           <br>
         </form>
-        <h4>{{exec_time}}</h4>
+        {% if exec_time!="" %}
+          <h4>Time elapsed: <b>{{exec_time}}</b></h4>
+        {% endif %}
+        {% if last_q!="" %}
+          <h4>Last executed query: <b>{{last_q}}</b></h4>
+        {% endif %}
         <br>
 	      {% for col in column_names[:1] %}
           <a class="btn btn-primary" role="button"href="http://ec2-18-232-130-25.compute-1.amazonaws.com:8080/getPlotCSV">Click here to download CSV File</a>
